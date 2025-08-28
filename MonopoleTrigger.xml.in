@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- Configuration for Magnetic Monopole Trigger Module -->
+<!-- For use with Pierre Auger Observatory Offline Framework -->
+
+<MonopoleTrigger
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation='@SCHEMALOCATION@/MonopoleTrigger.xsd'>
+
+  <!-- Energy range for monopole search -->
+  <EnergyRange>
+    <MinEnergy unit="eV"> 1e16 </MinEnergy>
+    <MaxEnergy unit="eV"> 1e20 </MaxEnergy>
+    <OptimalRange unit="eV"> 1e18 </OptimalRange>  <!-- Where sensitivity is best -->
+  </EnergyRange>
+
+  <!-- Monopole Detection Thresholds -->
+  <DetectionThresholds>
+    
+    <!-- Signal amplitude thresholds -->
+    <SignalAmplitude>
+      <HighThreshold unit="VEM"> 50 </HighThreshold>           <!-- Basic threshold -->
+      <VeryHighThreshold unit="VEM"> 100 </VeryHighThreshold>  <!-- Strong candidate -->
+      <ExtremeThreshold unit="VEM"> 200 </ExtremeThreshold>    <!-- Definite monopole -->
+    </SignalAmplitude>
+    
+    <!-- Duration requirements -->
+    <SignalDuration>
+      <MinimumDuration unit="ns"> 1000 </MinimumDuration>      <!-- 1 microsecond -->
+      <PreferredDuration unit="ns"> 2000 </PreferredDuration>  <!-- 2 microseconds -->
+      <SustainedFraction> 0.3 </SustainedFraction>             <!-- 30% of trace above threshold -->
+    </SignalDuration>
+    
+    <!-- Total charge requirements -->
+    <ChargeThresholds>
+      <MinimumCharge unit="VEM"> 1000 </MinimumCharge>
+      <StrongCandidateCharge unit="VEM"> 5000 </StrongCandidateCharge>
+      <DefiniteMonopoleCharge unit="VEM"> 10000 </DefiniteMonopoleCharge>
+    </ChargeThresholds>
+    
+    <!-- Smoothness criteria (RMS of derivative) -->
+    <SmoothnessThresholds>
+      <MaximumRMS unit="VEM"> 10.0 </MaximumRMS>        <!-- Upper limit for candidates -->
+      <PreferredRMS unit="VEM"> 5.0 </PreferredRMS>     <!-- Good monopole candidate -->
+      <ExcellentRMS unit="VEM"> 2.0 </ExcellentRMS>     <!-- Very smooth, monopole-like -->
+    </SmoothnessThresholds>
+    
+    <!-- Pulse shape criteria -->
+    <PulseShape>
+      <MaxPeakToPlateau> 1.5 </MaxPeakToPlateau>        <!-- Nearly rectangular -->
+      <MinRiseTime unit="ns"> 25 </MinRiseTime>         <!-- Very fast rise -->
+      <MaxRiseTime unit="ns"> 100 </MaxRiseTime>        <!-- Still acceptable -->
+    </PulseShape>
+    
+  </DetectionThresholds>
+
+  <!-- Multi-station coincidence requirements -->
+  <CoincidenceRequirements>
+    <MinimumStations> 3 </MinimumStations>              <!-- Need at least 3 stations -->
+    <PreferredStations> 5 </PreferredStations>          <!-- Better with 5+ stations -->
+    <MaxStationSeparation unit="km"> 3.0 </MaxStationSeparation>  <!-- Adjacent stations -->
+    <ChargeConsistency> 0.5 </ChargeConsistency>       <!-- Max 50% charge variation -->
+    <TrackLinearity> 0.95 </TrackLinearity>             <!-- Straightness requirement -->
+  </CoincidenceRequirements>
+
+  <!-- Machine Learning Scoring -->
+  <MLScoring>
+    <EnableML> true </EnableML>
+    <ScoreThreshold> 0.6 </ScoreThreshold>              <!-- ML score for candidate -->
+    <HighConfidenceThreshold> 0.8 </HighConfidenceThreshold>
+    
+    <!-- Feature weights for ML score calculation -->
+    <FeatureWeights>
+      <DurationWeight> 0.30 </DurationWeight>
+      <ChargeWeight> 0.25 </ChargeWeight>
+      <SmoothnessWeight> 0.20 </SmoothnessWeight>
+      <ShapeWeight> 0.15 </ShapeWeight>
+      <AmplitudeWeight> 0.10 </AmplitudeWeight>
+    </FeatureWeights>
+  </MLScoring>
+
+  <!-- Expected Monopole Properties -->
+  <MonopolePhysics>
+    <!-- Magnetic charge in units of Dirac charge (g = n * gD) -->
+    <MagneticCharge>
+      <DiracMultiplier> 1 </DiracMultiplier>            <!-- n = 1 (minimum) -->
+      <DiracCharge unit="e"> 68.5 </DiracCharge>        <!-- gD = 68.5e -->
+    </MagneticCharge>
+    
+    <!-- Expected mass range from GUT theories -->
+    <MassRange>
+      <MinMass unit="GeV"> 1e16 </MinMass>              <!-- GUT scale -->
+      <MaxMass unit="GeV"> 1e17 </MaxMass>
+    </MassRange>
+    
+    <!-- Energy loss in water -->
+    <EnergyLoss>
+      <IonizationRate unit="MeV/cm"> 5000 </IonizationRate>  <!-- ~4700 * (g/gD)^2 -->
+      <CherenkovEnhancement> 4700 </CherenkovEnhancement>     <!-- (g/e)^2 enhancement -->
+    </EnergyLoss>
+  </MonopolePhysics>
+
+  <!-- Trigger Actions -->
+  <TriggerActions>
+    <GenerateT1> true </GenerateT1>                     <!-- Create T1 trigger -->
+    <ForceT3> true </ForceT3>                          <!-- Force T3 even if below normal threshold -->
+    <ExtendedReadout> true </ExtendedReadout>          <!-- Save extended trace window -->
+    <HighPriority> true </HighPriority>                <!-- Mark as high priority event -->
+    <SaveRawData> true </SaveRawData>                  <!-- Always save raw FADC traces -->
+    <AlertGeneration> true </AlertGeneration>          <!-- Generate real-time alert -->
+  </TriggerActions>
+
+  <!-- Output Configuration -->
+  <OutputConfiguration>
+    <OutputFile> monopole_candidates.root </OutputFile>
+    <SaveAllCandidates> true </SaveAllCandidates>
+    <SaveTraceHistograms> true </SaveTraceHistograms>
+    <MaxHistograms> 1000 </MaxHistograms>
+    
+    <!-- Diagnostic outputs -->
+    <DiagnosticMode> false </DiagnosticMode>           <!-- Verbose debugging -->
+    <SaveFailedCandidates> false </SaveFailedCandidates>
+    <LogLevel> INFO </LogLevel>                        <!-- INFO, DEBUG, or ERROR -->
+  </OutputConfiguration>
+
+  <!-- Background Rejection -->
+  <BackgroundRejection>
+    <!-- Known backgrounds to reject -->
+    <RejectSingleMuons> true </RejectSingleMuons>
+    <RejectLightning> true </RejectLightning>
+    <RejectAccidentals> true </RejectAccidentals>
+    
+    <!-- Anti-coincidence requirements -->
+    <RequireMultiPMT> true </RequireMultiPMT>          <!-- Need signal in multiple PMTs -->
+    <VetoFlashADC> true </VetoFlashADC>                <!-- Veto if all PMTs saturate simultaneously -->
+  </BackgroundRejection>
+
+  <!-- Special Analysis Modes -->
+  <SpecialModes>
+    <!-- Search for slower monopoles -->
+    <SlowMonopoleSearch>
+      <Enable> true </Enable>
+      <BetaMin> 0.1 </BetaMin>                         <!-- v = 0.1c minimum -->
+      <BetaMax> 0.9 </BetaMax>                         <!-- v = 0.9c maximum -->
+    </SlowMonopoleSearch>
+    
+    <!-- Search for monopole-antimonopole pairs -->
+    <MonopolePairSearch>
+      <Enable> false </Enable>
+      <MaxSeparation unit="m"> 100 </MaxSeparation>
+      <TimeCoincidence unit="ns"> 500 </TimeCoincidence>
+    </MonopolePairSearch>
+    
+    <!-- Cross-check with FD -->
+    <HybridMode>
+      <Enable> true </Enable>
+      <RequireFD> false </RequireFD>                   <!-- Don't require, but use if available -->
+      <ExpectedFDSignal> continuous </ExpectedFDSignal> <!-- Expect continuous light track -->
+    </HybridMode>
+  </SpecialModes>
+
+  <!-- Validation Requirements -->
+  <Validation>
+    <SimulationCrosschecks> true </SimulationCrosschecks>
+    <RequireGeant4> false </RequireGeant4>             <!-- Optional Geant4 validation -->
+    <InjectionTests> true </InjectionTests>            <!-- Test with injected monopole signals -->
+    <BlindAnalysis> false </BlindAnalysis>             <!-- Keep analysis unblinded -->
+  </Validation>
+
+</MonopoleTrigger>
